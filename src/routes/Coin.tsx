@@ -1,15 +1,20 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useMatch, Routes, Route, Link } from "react-router-dom";
 import styled from "styled-components";
 import {useEffect, useState} from "react";
+import Price from "./Price";
+import Chart from "./Chart";
+import { useQuery } from "react-query";
+import { fetchCoinInfo } from "./api";
+import { fetchCoinTikers } from "./api";
 
 const Title = styled.h1`
   font-size: 48px;
-  color:${(props) => props.theme.accentColor};
+  color:${(props) => props.theme.textColor};
 `;
 
 const Loader = styled.div`
   text-align: center;
-  color: white;
+  color: ${(props) => props.theme.textColor };
 `;
 
 const Container = styled.div`
@@ -37,6 +42,7 @@ const OverviewItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: ${(props) => props.theme.bgColor};
 
   span:first-child {
     font-size: 12px;
@@ -48,6 +54,28 @@ const OverviewItem = styled.div`
 const Description = styled.p`
   margin: 20px 0px;
   color: white;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+
+const Tab = styled.div<{isActive : boolean}>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: ${(props) => props.isActive ? 'white' : props.theme.bgColor};
+  padding: 7px 0px;
+  border-radius: 10px;
+  border: solid 3px white;
+  a {
+    display: block;
+    color: ${(props) => props.isActive ? props.theme.bgColor : 'white'};
+  }
 `;
 
 interface RouteState {
@@ -110,9 +138,13 @@ interface IPriceData {
 }
 
 function Coin() {
-  const [loading, setLoading] = useState(true);
   const {coinId} = useParams();
   const {state} = useLocation() as RouteState;
+  const priceMatch = useMatch("/:coinId/price");
+  const chartMatch = useMatch("/:coinId/chart");
+  const {isLoading:infoLoading, data:infoData} = useQuery<IInfoData>(["info", coinId], () => fetchCoinInfo(coinId))
+  const {isLoading: tickersLoading, data:tickersData} = useQuery<IPriceData>(["tickers", coinId], () => fetchCoinTikers(coinId))
+  /* const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState<IInfoData>();
   const [priceInfo, setPriceInfo] = useState<IPriceData>();
   useEffect(()=> {
@@ -127,11 +159,12 @@ function Coin() {
       setPriceInfo(priceData);
       setLoading(false);
     })()
-  }, []);
+  }, []); */
+  const loading = infoLoading || tickersLoading;
   return (
     <Container>
       <Header>
-        <Title>{state?.name ? state.name : loading ? "Loading..." : info?.name}</Title>
+        <Title>{state?.name ? state.name : loading ? "Loading..." : infoData?.name}</Title>
       </Header>
         {loading ? <Loader>Loading...</Loader> :
         (
@@ -139,28 +172,42 @@ function Coin() {
             <Overview>
               <OverviewItem>
                 <span>RANK:</span>
-                <span>{info?.rank}</span>
+                <span>{infoData?.rank}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>SYMBOL:</span>
-                <span>{info?.symbol}</span>
+                <span>{infoData?.symbol}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>OPEN SOURCE:</span>
-                <span>{info?.open_source ? "YES" : "NO"}</span>
+                <span>{infoData?.open_source ? "YES" : "NO"}</span>
               </OverviewItem>
             </Overview>
-            <Description>{info?.description}</Description>
+            <Description>{infoData?.description}</Description>
             <Overview>
               <OverviewItem>
                 <span>TOTAL SUPPLY:</span>
-                <span>{priceInfo?.total_supply}</span>
+                <span>{tickersData?.total_supply}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>MAX SUPPLY:</span>
-                <span>{priceInfo?.max_supply}</span>
+                <span>{tickersData?.max_supply}</span>
               </OverviewItem>
             </Overview>
+
+            <Tabs>
+              <Tab isActive={chartMatch !== null}>
+                <Link to="chart">Chart</Link>
+              </Tab>
+              <Tab isActive={priceMatch !== null}>
+                <Link to="price">Price</Link>
+              </Tab>
+            </Tabs>
+
+            <Routes>
+              <Route path="price" element={<Price />} />
+              <Route path="chart" element={<Chart />} />
+            </Routes>
           </>
         )}
     </Container>

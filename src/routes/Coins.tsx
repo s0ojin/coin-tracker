@@ -2,6 +2,8 @@
 import styled from "styled-components";
 import {Link} from "react-router-dom";
 import {useState, useEffect} from "react";
+import { useQuery } from "react-query";
+import { fetchCoins } from "./api";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -20,7 +22,7 @@ const CoinsList = styled.ul``;
 
 const Coin = styled.li`
   background-color: white;
-  color: ${(props)=>props.theme.textColor};
+  color: ${(props)=>props.theme.bgColor};
   border-radius:  15px;
   margin-bottom: 10px;
   a {
@@ -38,7 +40,7 @@ const Coin = styled.li`
 
 const Title = styled.h1`
   font-size: 48px;
-  color:${(props) => props.theme.accentColor};
+  color:${(props) => props.theme.textColor};
 `;
 
 const Loader = styled.div`
@@ -52,7 +54,7 @@ const Img = styled.img`
   margin-right: 10px;
 `;
 
-interface CoinInterface {
+interface ICoin {
   id: string,
   name: string,
   symbol: string,
@@ -64,7 +66,8 @@ interface CoinInterface {
 
 
 function Coins() {
-  const [coins, setCoins] = useState<CoinInterface[]>([]);
+  const { isLoading, data } = useQuery<ICoin[]>("allCoins", fetchCoins)
+/* const [coins, setCoins] = useState<CoinInterface[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async() => {
@@ -73,14 +76,14 @@ function Coins() {
       setCoins(json.slice(0,100));
       setLoading(false);
       })();
-  }, []);
+  }, []); */
   return (
   <Container>
     <Header>
       <Title>코인</Title>
     </Header>
-      {loading ? <Loader>Loading...</Loader> : (<CoinsList>
-        {coins.map((coin) => (
+      {isLoading ? <Loader>Loading...</Loader> : (<CoinsList>
+        {data?.slice(0, 100).map((coin) => (
           <Coin key={coin.id}>
             <Link to={`/${coin.id}`} state={{name:coin.name}}>
               <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`} />
