@@ -1,11 +1,13 @@
 import { useLocation, useParams, useMatch, Routes, Route, Link } from "react-router-dom";
 import styled from "styled-components";
 import {useEffect, useState} from "react";
+import { useQuery } from "react-query";
+import { Helmet } from "react-helmet";
 import Price from "./Price";
 import Chart from "./Chart";
-import { useQuery } from "react-query";
 import { fetchCoinInfo } from "./api";
 import { fetchCoinTikers } from "./api";
+import Coins from "./Coins";
 
 const Title = styled.h1`
   font-size: 48px;
@@ -78,6 +80,12 @@ const Tab = styled.div<{isActive : boolean}>`
   }
 `;
 
+const BackBtn = styled.span`
+  display: inline-block;
+  padding: 10px;
+  margin: 10px 0px;
+`;
+
 interface RouteState {
   state: {name: string};
 }
@@ -143,7 +151,12 @@ function Coin() {
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
   const {isLoading:infoLoading, data:infoData} = useQuery<IInfoData>(["info", coinId], () => fetchCoinInfo(coinId))
-  const {isLoading: tickersLoading, data:tickersData} = useQuery<IPriceData>(["tickers", coinId], () => fetchCoinTikers(coinId))
+  const {isLoading: tickersLoading, data:tickersData} = useQuery<IPriceData>(["tickers", coinId],
+  () => fetchCoinTikers(coinId),
+  {
+    refetchInterval: 5000,
+  }
+  );
   /* const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState<IInfoData>();
   const [priceInfo, setPriceInfo] = useState<IPriceData>();
@@ -162,9 +175,22 @@ function Coin() {
   }, []); */
   const loading = infoLoading || tickersLoading;
   return (
+    <>
+    <BackBtn>
+      <Link to="/">
+        &larr; BACK
+      </Link>
+    </BackBtn>
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
-        <Title>{state?.name ? state.name : loading ? "Loading..." : infoData?.name}</Title>
+        <Title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </Title>
       </Header>
         {loading ? <Loader>Loading...</Loader> :
         (
@@ -179,8 +205,8 @@ function Coin() {
                 <span>{infoData?.symbol}</span>
               </OverviewItem>
               <OverviewItem>
-                <span>OPEN SOURCE:</span>
-                <span>{infoData?.open_source ? "YES" : "NO"}</span>
+                <span>PRICE:</span>
+                <span>${tickersData?.quotes.USD.price.toFixed(3)}</span>
               </OverviewItem>
             </Overview>
             <Description>{infoData?.description}</Description>
@@ -194,7 +220,6 @@ function Coin() {
                 <span>{tickersData?.max_supply}</span>
               </OverviewItem>
             </Overview>
-
             <Tabs>
               <Tab isActive={chartMatch !== null}>
                 <Link to="chart">Chart</Link>
@@ -203,14 +228,14 @@ function Coin() {
                 <Link to="price">Price</Link>
               </Tab>
             </Tabs>
-
             <Routes>
-              <Route path="price" element={<Price />} />
+              <Route path="price" element={<Price coinId={coinId}/>} />
               <Route path="chart" element={<Chart coinId={coinId} />} />
             </Routes>
           </>
         )}
     </Container>
+    </>
   );
 }
 export default Coin;
