@@ -26,7 +26,7 @@ const Container = styled.div`
 const Item = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: ${(props) => props.theme.textColor};
   border-radius: 10px;
   padding: 20px;
   text-align: center;

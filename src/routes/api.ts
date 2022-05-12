@@ -1,8 +1,8 @@
 const BASE_URL = `https://api.coinpaprika.com/v1`
 
 
-export function fetchCoins() {
-  return fetch(`${BASE_URL}/coins`)
+export function fetchTikers() {
+  return fetch(`${BASE_URL}/tickers`)
   .then((response) => response.json()
   );  
 }

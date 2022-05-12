@@ -35,7 +35,7 @@ const Header = styled.header`
 const Overview = styled.div`
   display: flex;
   justify-content: space-between;
-  background-color: white;
+  background-color: ${(props) => props.theme.textColor};
   padding: 20px 20px;
   border-radius: 10px;
 `;
@@ -55,7 +55,7 @@ const OverviewItem = styled.div`
 
 const Description = styled.p`
   margin: 20px 0px;
-  color: white;
+  color: ${(props) => props.theme.textColor};
 `;
 
 const Tabs = styled.div`
@@ -70,20 +70,14 @@ const Tab = styled.div<{isActive : boolean}>`
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 400;
-  background-color: ${(props) => props.isActive ? 'white' : props.theme.bgColor};
+  background-color: ${(props) => props.isActive ? props.theme.textColor : props.theme.bgColor};
   padding: 7px 0px;
   border-radius: 10px;
-  border: solid 3px white;
+  border: solid 2px ${(props) => props.theme.textColor};
   a {
     display: block;
-    color: ${(props) => props.isActive ? props.theme.bgColor : 'white'};
+    color: ${(props) => props.isActive ? props.theme.bgColor : props.theme.textColor};
   }
-`;
-
-const BackBtn = styled.span`
-  display: inline-block;
-  padding: 10px;
-  margin: 10px 0px;
 `;
 
 interface RouteState {
@@ -150,7 +144,7 @@ function Coin() {
   const {state} = useLocation() as RouteState;
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
-  const {isLoading:infoLoading, data:infoData} = useQuery<IInfoData>(["info", coinId], () => fetchCoinInfo(coinId))
+  const {isLoading: infoLoading, data:infoData} = useQuery<IInfoData>(["info", coinId], () => fetchCoinInfo(coinId))
   const {isLoading: tickersLoading, data:tickersData} = useQuery<IPriceData>(["tickers", coinId],
   () => fetchCoinTikers(coinId),
   {
@@ -175,12 +169,7 @@ function Coin() {
   }, []); */
   const loading = infoLoading || tickersLoading;
   return (
-    <>
-    <BackBtn>
-      <Link to="/">
-        &larr; BACK
-      </Link>
-    </BackBtn>
+    
     <Container>
       <Helmet>
         <title>
@@ -235,7 +224,7 @@ function Coin() {
           </>
         )}
     </Container>
-    </>
+    
   );
 }
 export default Coin;

@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {useState, useEffect} from "react";
 import { useQuery } from "react-query";
 import { Helmet } from "react-helmet";
-import { fetchCoins } from "./api";
+import { fetchTikers } from "./api";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -12,22 +12,25 @@ const Container = styled.div`
 `;
 
 const Header = styled.header`
-  height: 10vh;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-const CoinsList = styled.ul``;
+const CoinsList = styled.ul`
+`;
 
 const Coin = styled.li`
-  background-color: white;
-  color: ${(props)=>props.theme.bgColor};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  color: ${(props)=>props.theme.textColor};
   border-radius:  15px;
+  border: solid 2px ${(props) => props.theme.textColor};
   margin-bottom: 10px;
   a {
-    display: flex;
-    align-items: center;
+    text-align: center;
     padding: 20px;
     transition: color 0.2s ease-in;
   }
@@ -36,16 +39,24 @@ const Coin = styled.li`
       color:${(props)=>props.theme.accentColor}
     }
   }
+  span {
+    margin: 10px;
+  }
 `;
 
 const Title = styled.h1`
-  font-size: 48px;
-  color:${(props) => props.theme.textColor};
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: -3px;
+  line-height: 90%;
+  font-weight: 600;
+  font-size: 40px;
+  margin-bottom: 30px;
+  color: ${(props) => props.theme.textColor};
 `;
 
 const Loader = styled.div`
   text-align: center;
-  color: white;
+  color: ${(props) => props.theme.textColor};
 `;
 
 const Img = styled.img`
@@ -54,19 +65,43 @@ const Img = styled.img`
   margin-right: 10px;
 `;
 
-interface ICoin {
-  id: string,
-  name: string,
-  symbol: string,
-  rank: number,
-  is_new: boolean,
-  is_active: boolean,
-  type: string,
+interface IPriceData {
+  id: string;
+  name: string;
+  symbol: string;
+  rank: number;
+  circulating_supply: number;
+  total_supply: number;
+  max_supply: number;
+  beta_value: number;
+  first_data_at: string;
+  last_updated: string;
+  quotes: {
+    USD:{
+      ath_date: string;
+      ath_price: number;
+      market_cap: number;
+      market_cap_change_24h: number;
+      percent_change_1h: number;
+      percent_change_1y: number;
+      percent_change_6h: number;
+      percent_change_7d: number;
+      percent_change_12h: number;
+      percent_change_15m: number;
+      percent_change_24h: number;
+      percent_change_30d: number;
+      percent_change_30m: number;
+      percent_from_price_ath: number;
+      price: number;
+      volume_24h: number;
+      volume_24h_change_24h: number;
+    }
+  };
 }
 
-
 function Coins() {
-  const { isLoading, data } = useQuery<ICoin[]>("allCoins", fetchCoins)
+  const { isLoading, data } = useQuery<IPriceData[]>("allCoins", fetchTikers)
+
 /* const [coins, setCoins] = useState<CoinInterface[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -81,19 +116,20 @@ function Coins() {
   <Container>
     <Helmet>
       <title>
-        코인
+        TOP100
       </title>
     </Helmet>
     <Header>
-      <Title>코인</Title>
+      <Title>TOP100</Title>
     </Header>
       {isLoading ? <Loader>Loading...</Loader> : (<CoinsList>
         {data?.slice(0, 100).map((coin) => (
           <Coin key={coin.id}>
             <Link to={`/${coin.id}`} state={{name:coin.name}}>
-              <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`} />
-              {coin.name} &rarr;
+                <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`} />
+                <span>{coin.name}</span>
             </Link>
+              <span>{coin.quotes.USD.percent_change_24h}</span>
           </Coin>
         ))}
       </CoinsList>)}
