@@ -7,7 +7,7 @@ import Footer from "./components/Footer";
 
 function Router() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Header />
         <Routes>
           <Route path="/:coinId/*" element={<Coin />} />
