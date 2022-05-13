@@ -26,6 +26,7 @@ const Loader = styled.div`
 const Container = styled.div`
   padding: 0px 20px;
   max-width: 480px;
+  min-height: 76vh;
   margin: 0 auto;
 `;
 

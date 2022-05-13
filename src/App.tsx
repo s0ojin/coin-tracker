@@ -35,9 +35,7 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
 }
-body {
-	line-height: 1;
-}
+
 ol, ul {
 	list-style: none;
 }
@@ -56,6 +54,11 @@ table {
 * {
   box-sizing: border-box ;
 }
+
+html, body {
+	height: 100%;
+}
+
 body {
   font-family: 'Source Sans Pro', sans-serif;
   background-color: ${(props)=>props.theme.bgColor};

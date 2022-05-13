@@ -7,6 +7,7 @@ import { fetchTikers } from "./api";
 
 const Container = styled.div`
   padding: 0px 20px;
+  min-height: 76vh;
   max-width: 480px;
   margin: 0 auto;
 `;
