@@ -11,7 +11,11 @@ import Coins from "./Coins";
 
 const Title = styled.h1`
   font-size: 48px;
+  text-transform: uppercase;
+  letter-spacing: -3px;
   color:${(props) => props.theme.textColor};
+  align-content: center;
+  margin-right: 25px;
 `;
 
 const Loader = styled.div`
@@ -78,6 +82,12 @@ const Tab = styled.div<{isActive : boolean}>`
     display: block;
     color: ${(props) => props.isActive ? props.theme.bgColor : props.theme.textColor};
   }
+`;
+
+const Img = styled.img`
+  width: 35px;
+  height: 35px;
+  margin-right: 10px;
 `;
 
 interface RouteState {
@@ -177,6 +187,7 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <Img src={`https://cryptocurrencyliveprices.com/img/${infoData?.id}.png`} />
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
@@ -210,11 +221,11 @@ function Coin() {
               </OverviewItem>
             </Overview>
             <Tabs>
-              <Tab isActive={chartMatch !== null}>
-                <Link to="chart">Chart</Link>
-              </Tab>
               <Tab isActive={priceMatch !== null}>
                 <Link to="price">Price</Link>
+              </Tab>
+              <Tab isActive={chartMatch !== null}>
+                <Link to="chart">Chart</Link>
               </Tab>
             </Tabs>
             <Routes>

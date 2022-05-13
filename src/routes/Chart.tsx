@@ -26,20 +26,30 @@ function Chart({coinId}:ChartProps)  {
       "Loading chart..." 
       ) : ( 
     <ApexChart 
-      type="line"
+      type="candlestick"
       series={[
         {
-          name: "price",
-          data: data?.map((price) => price.close) as number[],
+          data: data?.map((price) => {
+            return{
+              x: price.time_open,
+              y: [price.open.toFixed(3), price.high.toFixed(3), price.low.toFixed(3), price.close.toFixed(3)]
+            }
+          })
         },
-      ]} 
+      ]as any} 
       options={{
         theme: {
-          mode: isDark ? "dark" :"light" 
+          mode: isDark ? "dark" : "light" 
+        },
+        plotOptions: {
+          candlestick: {
+            colors: {
+              upward: "#4cd137",
+              downward: "#e84118"
+            }
+          }
         },
         chart: {
-          height: 500,
-          width: 500,
           toolbar: {show:false},
           background: "transparent",
         },
@@ -57,17 +67,6 @@ function Chart({coinId}:ChartProps)  {
           type: "datetime",
           categories: data?.map((price) => price.time_close),
         },
-        fill: {
-          type: "gradient",
-          gradient: {
-            gradientToColors:["#C9FFBF"],
-            stops: [0, 90]
-          }
-        },
-        colors: ["#FFAFBD"],
-        tooltip: {
-
-        }
       }}
     />
   )}

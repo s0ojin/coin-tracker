@@ -20,18 +20,19 @@ const Header = styled.header`
 const CoinsList = styled.ul`
 `;
 
-const Coin = styled.li`
+const Coin = styled.li<{isPositive:boolean}>`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   background-color: transparent;
   color: ${(props)=>props.theme.textColor};
   border-radius:  15px;
   border: solid 2px ${(props) => props.theme.textColor};
   margin-bottom: 10px;
   a {
-    text-align: center;
-    padding: 20px;
+    display: flex;
+    flex-basis: 190px;
+    align-items: center;
+    padding: 10px;
     transition: color 0.2s ease-in;
   }
   &:hover {
@@ -40,7 +41,13 @@ const Coin = styled.li`
     }
   }
   span {
-    margin: 10px;
+    margin-left: 20px;
+    margin-right: auto;
+  }
+  span:last-child {
+    margin: 15px;
+    font-weight: 600;
+    color: ${(props) => props.isPositive ? "#4cd137" : "#e84118"}
   }
 `;
 
@@ -48,7 +55,6 @@ const Title = styled.h1`
   font-family: 'Open Sans', sans-serif;
   letter-spacing: -3px;
   line-height: 90%;
-  font-weight: 600;
   font-size: 40px;
   margin-bottom: 30px;
   color: ${(props) => props.theme.textColor};
@@ -62,7 +68,7 @@ const Loader = styled.div`
 const Img = styled.img`
   width: 35px;
   height: 35px;
-  margin-right: 10px;
+  margin: 15px;
 `;
 
 interface IPriceData {
@@ -124,12 +130,13 @@ function Coins() {
     </Header>
       {isLoading ? <Loader>Loading...</Loader> : (<CoinsList>
         {data?.slice(0, 100).map((coin) => (
-          <Coin key={coin.id}>
-            <Link to={`/${coin.id}`} state={{name:coin.name}}>
-                <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`} />
-                <span>{coin.name}</span>
+          <Coin key={coin.id} isPositive={coin.quotes.USD.percent_change_24h > 0}>
+            <Link to={`/${coin.id}/price`} state={{name:coin.name}}>
+              <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`} />
+              <div>{coin.name}</div>
             </Link>
-              <span>{coin.quotes.USD.percent_change_24h}</span>
+            <span>$ {coin.quotes.USD.price.toFixed(3)}</span>
+            <span>{coin.quotes.USD.percent_change_24h}%</span>
           </Coin>
         ))}
       </CoinsList>)}

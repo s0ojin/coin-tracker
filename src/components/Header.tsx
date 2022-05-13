@@ -36,6 +36,10 @@ const Logo = styled.div`
 const ModeBtn = styled.div`
   font-size: 30px;
   margin: 0px 30px;
+  &:hover {
+    color: #f1c40f;
+    transition: color 0.3s ease-in;
+  }
 `;
 
 function Header() {
